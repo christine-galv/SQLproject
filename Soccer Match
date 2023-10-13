@@ -1,0 +1,7 @@
+SELECT  c.name,
+m.season, 
+(home_goal + away_goal) AS goals,
+AVG(home_goal + away_goal) OVER(PARTITIONBY m.season, c.name) AS season_ctry_avg
+FROM country AS c
+LEFTJOINmatchAS m 
+ON c.id = m.country_id;

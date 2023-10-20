@@ -1,0 +1,6 @@
+SELECT *
+#selecting all languages in the DB
+FROM world.languages 
+#location of the DB
+LIMIT 5;
+#limiting the results to top 5

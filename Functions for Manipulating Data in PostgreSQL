@@ -1,0 +1,87 @@
+ SELECT * 
+ FROM INFORMATION_SCHEMA.COLUMNS 
+ WHERE table_name = 'actor';
+-----
+-- Get the column name and data type
+SELECT
+ 	column_name, 
+    data_type
+-- From the system database information schema
+FROM INFORMATION_SCHEMA.COLUMNS 
+-- For the customer table
+WHERE table_name = 'customer';
+----TIMESTAMP data types; contain both a data value and a time value with microsecond precision----
+ISO 8601 format yyyy-mm-dd
+----DATE and TIME data types; essentially the date and time values of the TIMESTAMP-- 
+----INTERVAL data types; when you want to do arithmetic on date and time columns---
+SELECT rental_date + INTERVAL '3 days' AS expected_return
+FROM rental;
+-----
+SELECT
+ 	-- Select the rental and return dates
+	return_date,
+	rental_date,
+ 	-- Calculate the expected_return_date
+	rental_date + '3 days' AS expected_return_date
+FROM rental;
+---ARRAYS----
+---CREATE TABLE example---
+CREATE TABLE my_firsT_table (
+  first_column text,
+  second_column integer
+);
+---INSERT example---
+INSERT INTO my_first_table
+  (first_column, second_column) VALUES ('text value' , 12);
+---ARRAY example---
+CREATE TABLE grades (
+  student_id int,
+  email text [][],
+  test_scores int[]
+);
+INSERT INTO grades
+  VALUES (1,
+  '{{"work", "work1@datacamp.com"},{"other", "other1@datacamp.com"}}',
+  '{92,85,96,88}' );
+--- Accessing ARRAYs----
+SELECT
+  email[1][1] AS type,
+  email[1][2] AS address,
+  test_scores[1],
+FROM grades;
+---
+SELECT
+  email[1][1] AS type,
+  email[1][2] AS address,
+  test_scores[1],
+FROM grades
+WHERE email[1][1] = 'work';
+---ARRAY functions and operators---
+SELECT
+  email[1][1] AS type,
+  email[1][2] AS address,
+  test_scores[1],
+FROM grades
+WHERE 'other' = ANY (email);
+---
+SELECT
+  email[2][1] as type,
+  email[2][2] as address,
+  test_scores[1]
+FROM grades
+WHERE email @> ARRAY['other'];
+---examples---
+-- Select the title and special features column 
+SELECT 
+  title, 
+  special_features 
+FROM film
+-- Use the array index of the special_features column
+WHERE special_features[1] = 'Deleted Scenes';
+-----
+SELECT
+  title, 
+  special_features 
+FROM film 
+-- Modify the query to use the ANY function 
+WHERE 'Trailers' = ANY (special_features);

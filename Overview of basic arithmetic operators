@@ -1,0 +1,121 @@
+---Adding and subtracting date/time data---
+SELECT date '2005-09-11' - date '2005-09-10';
+SELECT date '2005-09-11' + integer '3';
+--Calculating time periods with AGE---
+SELECT AGE(timestamp '2005-09-11 00:00:00', timestamp '2005-09-09 12:00:00');
+---example---
+SELECT
+  AGE(rental_date)
+FROM rental;
+SELECT timestamp '2019-05-01' + 21 * INTERVAL '1 day';
+SELECT f.title, f.rental_duration,
+    -- Calculate the number of days rented
+    r.return_date - r.rental_date AS days_rented
+FROM film AS f
+     INNER JOIN inventory AS i ON f.film_id = i.film_id
+     INNER JOIN rental AS r ON i.inventory_id = r.inventory_id
+ORDER BY f.title;
+SELECT f.title, f.rental_duration,
+    -- Calculate the number of days rented
+	AGE(r.return_date, r.rental_date) AS days_rented
+FROM film AS f
+	INNER JOIN inventory AS i ON f.film_id = i.film_id
+	INNER JOIN rental AS r ON i.inventory_id = r.inventory_id
+ORDER BY f.title;
+SELECT
+    f.title,
+ 	-- Convert the rental_duration to an interval
+    INTERVAL '1' day * f.rental_duration,
+ 	-- Calculate the days rented as we did previously
+    r.return_date - r.rental_date AS days_rented
+FROM film AS f
+    INNER JOIN inventory AS i ON f.film_id = i.film_id
+    INNER JOIN rental AS r ON i.inventory_id = r.inventory_id
+-- Filter the query to exclude outstanding rentals
+WHERE r.return_date IS NOT NULL
+ORDER BY f.title;
+SELECT
+    f.title,
+	r.rental_date,
+    f.rental_duration,
+    -- Add the rental duration to the rental date
+    INTERVAL '1' day * f.rental_duration + r.rental_date AS expected_return_date,
+    r.return_date
+FROM film AS f
+    INNER JOIN inventory AS i ON f.film_id = i.film_id
+    INNER JOIN rental AS r ON i.inventory_id = r.inventory_id
+ORDER BY f.title;
+--Retrieving the current timestamp--
+SELECT NOW();
+SELECT NOW()::timestamp;
+---CAST() function;
+SELECT CAST(NOW)) as timestamp);
+SELECT CURRENT_TIMESTAMP;
+SELECT CURRENT_TIMESTAMP(2);
+SELECT CURRENT_DATE;
+SELECT CURRENT_TIME;
+SELECT 
+	-- Select the current date
+	CURRENT_DATE,
+    -- CAST the result of the NOW() function to a date
+    CAST( NOW() AS date )
+--Select the current timestamp without timezone
+SELECT CURRENT_TIMESTAMP::timestamp AS right_now;
+---Extracting and transforming date/time data---
+---Exploring the EXTRACt(), DATE_PART() and DATE_TRUNC() functions---
+EXTRACT(field FROM source)
+SELECT EXTRACT(quarter FROM timestamp '2005-01-24 05:12:00') AS quarter;
+DATE_PART('field', source)
+DATE_PART('quarter', timestamp '2005-01-24' 05:12:00') AS quarter;
+SELECT
+  EXTRACT(quarter FROM payment_date) AS quarter,
+  EXTRACT(year FROM payment_date) AS year,
+  SUM(amount_ AS total_payments
+FROM
+  payment
+GROUP BY 1, 2;
+---DATE_TRUNC() function will truncate timestamp or interval data types---
+-- Truncate rental_date by year
+SELECT DATE_TRUNC('year', rental_date) AS rental_year
+FROM rental;
+
+SELECT 
+  DATE_TRUNC('day', rental_date) AS rental_day,
+  -- Count total number of rentals 
+  COUNT(rental_id) AS rentals 
+FROM rental
+GROUP BY 1;
+SELECT 
+  -- Extract the day of week date part from the rental_date
+  EXTRACT(dow FROM rental_date) AS dayofweek,
+  AGE(return_date, rental_date) AS rental_days
+FROM rental AS r 
+WHERE 
+  -- Use an INTERVAL for the upper bound of the rental_date 
+  rental_date BETWEEN CAST('2005-05-01' AS DATE)
+SELECT 
+  c.first_name || ' ' || c.last_name AS customer_name,
+  f.title,
+  r.rental_date,
+  -- Extract the day of week date part from the rental_date
+  EXTRACT(dow FROM r.rental_date) AS dayofweek,
+  AGE(r.return_date, r.rental_date) AS rental_days,
+  -- Use DATE_TRUNC to get days from the AGE function
+  CASE WHEN DATE_TRUNC('day', AGE(r.return_date, r.rental_date)) > 
+  -- Calculate number of d
+    f.rental_duration * INTERVAL '1' day 
+  THEN TRUE 
+  ELSE FALSE END AS past_due 
+FROM 
+  film AS f 
+  INNER JOIN inventory AS i 
+  	ON f.film_id = i.film_id 
+  INNER JOIN rental AS r 
+  	ON i.inventory_id = r.inventory_id 
+  INNER JOIN customer AS c 
+  	ON c.customer_id = r.customer_id 
+WHERE 
+  -- Use an INTERVAL for the upper bound of the rental_date 
+  r.rental_date BETWEEN CAST('2005-05-01' AS DATE) 
+  AND CAST('2005-05-01' AS DATE) + INTERVAL '90 day';
+   AND CAST('2005-05-01' AS DATE) + INTERVAL '90 day';

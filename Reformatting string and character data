@@ -1,0 +1,45 @@
+ ***String Concatenation with functions**
+ SELECT
+   CONCAT(first_name, ' ', last_name) AS full_name
+   FROM customer;
+   ***String concatenation with a non-string input**
+   SELECT
+     customer_id|| ':'
+     || first_name || ' '
+     || last_name AS full_name
+FROM customer;
+** || = douple pipe function
+***Changing the case of string**
+SELECT
+  UPPER(email)
+FROM customer;
+**LOWER function**
+SELECT
+  LOWER(title)
+FROM film;
+**INITCAP function**
+SELECT
+  INITCAP(title)
+FROM film;
+**Replacing characters in a string**
+SELECT
+  REPLACE(description, 'A Astounding',
+            'An Astounding') as description
+FROM film;
+**Manipulating string data with REVERSE**
+SELECT
+  title,
+  **Examples**
+  -- Concatenate the first_name and last_name 
+SELECT first_name || ' ' || last_name  || ' <' || email || '>' AS full_email 
+FROM customer
+-- Concatenate the first_name and last_name and email
+SELECT CONCAT(first_name, ' ', last_name, ' <', email, '>') AS full_email 
+FROM customer
+  REVERSE(title)
+FROM
+  film AS f;
+SELECT 
+  -- Replace whitespace in the film title with an underscore
+  REPLACE(title, ' ', '_') AS title
+FROM film; 

@@ -1,0 +1,66 @@
+**CHAR_LENGHT function can be used to determine the number of characters in a string**
+SELECT
+  title,
+  CHAR_LENGHT(title)
+FROM film;
+**Determining the lenght of a string**
+SELECT
+  title,
+  LENGHT(title)
+FROM film;
+**Finding the position of a character in a string**
+SELECT
+  email,
+  POSITION('@' IN email)
+FROM customer;
+**Finding the position of a character in a string** **STRPOS is analogous to POSITION with a slightly different syntax as you see in this example**
+SELECT
+  email,
+  STRPOS(email, '@')
+FROM customer;
+**Parsing string data - LEFT function allows you to extend the first "n" characters of a string**
+SELECT
+  LEFT(description, 50)
+FROM film;
+**RIGHT function**
+SELECT
+  RIGHT(description, 50)
+FROM film;
+**Extracting substrings of a character data - SUBSTRING allows us to do pretty much exactly what its name implies - extract a substring from text data**
+SELECT
+  SUBSTRING(description, 10, 50)
+FROM
+  film AS f;
+SELECT
+  SUBSTRING(email FROM 0 FOR POSITION('@' IN email))
+FROM
+  customer;
+**Extracting substrings of a character data**
+SELECT
+  SUBSTRING(email FROM POSITION('@' IN email)+1 FOR CHAR_LENGHT(email))
+FROM
+  customer;
+**SUBSTR is analogous to SUBSTRING but only allows for the parameters to be separated** 
+SELECT
+  SUBSTR(description, 10, 50)
+FROM
+  film AS f;
+**PRACTICE**
+SELECT 
+  -- Select the title and description columns
+  title,
+  description,
+  -- Determine the length of the description column
+  LENGTH(description) AS desc_len
+FROM film;
+SELECT 
+  -- Select only the street name from the address table
+  SUBSTRING(address FROM POSITION(' ' IN address)+1 FOR LENGTH(address))
+FROM 
+  address;
+SELECT
+  -- Extract the characters to the left of the '@'
+  LEFT(email, POSITION('@' IN email)-1) AS username,
+  -- Extract the characters to the right of the '@'
+  SUBSTRING(email FROM POSITION('@' IN email)+1 FOR LENGTH(email)) AS domain
+FROM customer;

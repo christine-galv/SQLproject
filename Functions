@@ -1,0 +1,33 @@
+-- Select the film title and inventory ids
+SELECT 
+	f.title, 
+    i.inventory_id,
+    -- Determine whether the inventory is held by a customer
+    inventory_held_by_customer(i.inventory_id) as held_by_cust
+FROM film as f 
+	INNER JOIN inventory AS i ON f.film_id=i.film_id 
+WHERE
+	-- Only include results where the held_by_cust is not null
+    inventory_held_by_customer(i.inventory_id) Is NOt NULL;
+**Intro to PostgreSQL extensions**
+*Commonly used extensions*
+PostGIS
+PostPic
+fuzzystrmatch
+pg_trgm
+**Querying extension meta data**
+SELECT name
+FROM pg_available_extensions
+*Installed Extensions*
+SELECT extname
+FROM pg_extension;
+--Enable the fuzzstrmatch extension-
+CREATE EXTENSION IF NOT EXISTS fuzzystrmatch;
+--Confirm that fuzzystrmatch has been enabled--
+SELECT extname FROM pg_extension;
+**Using fuzzstrmatchh or fuzzy searching**
+SELECT levenshtein('GUMBO', 'GAMBOL');
+**Compare two strings with pg_trgm__
+SELECT similarity('GUMBO', 'GAMBOL');
+-- Enable the pg_trgm extension
+CREATE EXTENSION IF NOT EXISTS pg_trgm;

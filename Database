@@ -1,0 +1,47 @@
+SELECT company.name 
+-- Table(s) to select from
+  FROM company 
+       INNER JOIN fortune500 
+       ON company.ticker=fortune500.ticker;
+-- Use coalesce
+SELECT coalesce(industry, sector, 'Unknown') AS industry2,
+       -- Don't forget to count!
+       COUNT(*)
+  FROM fortune500 
+-- Group by what? (What are you counting by?)
+ GROUP BY industry2
+-- Order results to see most common first
+ ORDER BY count DESC 
+-- Limit results to get just the one value you want
+ LIMIT 1;
+-- Select the 3 columns desired
+SELECT tag_type.tag, company.name, tag_type.type
+  FROM company
+  	   -- Join to the tag_company table
+       INNER JOIN tag_company 
+       ON company.id = tag_company.company_id
+       -- Join to the tag_type table
+       INNER JOIN tag_type
+       ON tag_company.tag = tag_type.tag
+  -- Filter to most common type
+  WHERE type='cloud';
+SELECT company_original.name, title, rank
+  -- Start with original company information
+  FROM company AS company_original
+       -- Join to another copy of company with parent
+       -- company information
+	   LEFT JOIN company AS company_parent
+       ON company_original.parent_id = company_parent.id 
+       -- Join to fortune500, only keep rows that match
+       INNER JOIN fortune500 
+       -- Use parent ticker if there is one, 
+       -- otherwise original ticker
+       ON coalesce(company_parent.ticker, 
+                   company_original.ticker) = 
+             fortune500.ticker
+ -- For clarity, order by rank
+ ORDER BY rank; 
+-- Divide 10 by 3
+SELECT 10/3,
+       -- Cast 10 as numeric and divide by 3
+       10::numeric/3;

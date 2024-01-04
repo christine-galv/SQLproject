@@ -1,0 +1,12 @@
+***Rabge: min and max***
+SELECT min(question_pct)
+  FROM stackoverflow;
+SELECT max(question_pct)
+  FROM stackoverflow;
+***Summarize by group***
+SELECT tag,
+        min(question_pct),
+        avg(question_pct),
+        max(question_pct)
+  FROM stackoverflow
+GROUP BY tag;

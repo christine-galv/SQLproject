@@ -1,0 +1,122 @@
+**Three types of PosgreSQL character types**
+--Character(n) or char(n)
+-fixed lenght n
+-trailing spaces ignored in comparisons
+--character varying(n) ir varchar(n)
+-variable lenght up to a maximum of n
+--text or varchar
+-unlimited lenght
+-example syntax
+SELECT category, ---categorical variable
+
+count(*)         ---count rows for each category
+
+FROM product     ---table
+
+GROUP BY category ---categorical value
+
+ORDER BY count DESC;--show most frequent values first
+
+---Common issues---
+--Case Matters ie 'apple' != 'Apple'
+--Spaces count ie ' apple' != ' apple'
+--Empty strings aren't NULL ie '' != NULL
+--Punctuation differences is 'to-do' != 'to-do'
+-- Find values of source that appear in at least 100 rows
+-- Also get the count of each value
+SELECT source, count(*)
+  FROM evanston311
+ GROUP BY source
+HAVING count(*) >=100;
+-- Find the 5 most common values of street and the count of each
+SELECT street, count(*)
+  FROM evanston311
+ GROUP BY street
+ ORDER BY count(*) DESC
+LIMIT 5;
+---Case sensitive comparisons--
+SELECT *
+  FROM fruit;
+
+SELECT *
+  FROM fruit
+WHERE lower(fav_fruit)='apple';
+--Case sensitive searches
+-USING LIKE
+SELECT *
+  FROM fruit
+--"apple" in value
+WHERE fav_fruit LIKE '%apple%';
+--USING ILIKE the I stands for insensitive
+SELECT *
+  FROM fruit
+--ILIKE for case insensitive
+WHERE fav_fruit ILIKE '%apple%';
+
+--Trimming spaces
+SELECT trim(' abc ');
+SELECT distinct street,
+       -- Trim off unwanted characters from street
+       trim(street, '0123456789 #/.') AS cleaned_street
+  FROM evanston311
+ ORDER BY cleaned_street;
+-- Count rows
+SELECT count(*)
+  FROM evanston311
+ -- Where description includes trash or garbage
+ WHERE description ILIKE '%trash%' 
+    OR description ILIKE '%garbage%';
+
+-- Count rows with each category
+SELECT category, count(*)
+  FROM evanston311 
+ WHERE (description ILIKE '%trash%'
+    OR description ILIKE '%garbage%') 
+   AND category NOT LIKE '%Trash%'
+   AND category NOT LIKE '%Garbage%'
+ -- What are you counting?
+ GROUP BY category
+ --- order by most frequent values
+ ORDER BY count DESC
+ LIMIT 10;
+
+--SPLITTING and CONCATENATING TEXT--
+-substring
+SELECT left('abcde', 2), ---first 2 characters
+      right('abcde', 2);  --last 2 characters
+--Substring
+SELECT substring(string FROM start FOR lenght);
+
+SELECT substring('abcdef' FROM 2 FOR 3);
+SELECT substr('abcdef', 2, 3);
+
+--splitting on a delimiter
+SELECT(split_part(string, delimiter, part);
+SELECT split_part('cats and dogs and fish', ' and ', 1);
+
+--Concatenating text
+SELECT concat('a', 2, 'cc');
+SELECT 'a' || 2 || 'cc';
+
+-- Concatenate house_num, a space, and street
+-- and trim spaces from the start of the result
+SELECT ltrim(concat(house_num, ' ', street)) AS address
+  FROM evanston311;
+
+-- Select the first word of the street value
+SELECT split_part(street, ' ', 1) AS street_name, 
+       count(*)
+  FROM evanston311
+ GROUP BY street_name
+ ORDER BY count DESC
+ LIMIT 20;
+-- Select the first 50 chars when length is greater than 50
+SELECT CASE WHEN length(description) > 50
+            THEN left(description, 50) || '...'
+       -- otherwise just select description
+       ELSE description
+       END
+  FROM evanston311
+ -- limit to descriptions that start with the word I
+ WHERE description LIKE 'I %'
+ ORDER BY description;

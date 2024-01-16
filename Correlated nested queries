@@ -1,0 +1,66 @@
+-- example correlated query
+SELECT *
+FROM movies AS m
+WHERE 5 <
+    (SELECT COUNT(*)
+      FROM renting AS r
+      WHERE r.movie_id=m.movie_id);
+--QUERIES with EXISTS
+SELECT *
+FROM movies AS m
+WHERE EXISTS
+      (SELECT *
+        FROM renting AS r
+        WHERE rating IS NOT NULL
+        AND r.movie_id=m.movie_id);
+---
+SELECT *
+FROM renting AS r
+WHERE rating IS NOT NULL
+AND r.movie_id = 1;
+--
+SELECT *
+FROM movies AS m
+WHERE NOT EXISTS
+      (SELECT *
+        FROM renting AS r
+        WHERE rating IS NOT NULL
+        AND r.movie_id=m.movie_id);
+--
+SELECT *
+FROM movies AS m
+WHERE EXISTS
+      (SELECT *
+        FROM renting AS r
+        WHERE rating IS NOT NULL
+        AND r.movie_id=m.movie_id);
+--
+SELECT name, 
+       nationality, 
+       year_of_birth
+FROM actors
+WHERE year_of_birth > 1990; -- Born after 1990
+--
+SELECT name, 
+       nationality, 
+       year_of_birth
+FROM actors
+WHERE nationality <> 'USA'
+UNION -- Select all actors who are not from the USA and all actors who are born after 1990
+SELECT name, 
+       nationality, 
+       year_of_birth
+FROM actors
+WHERE year_of_birth > 1990;
+--
+SELECT name, 
+       nationality, 
+       year_of_birth
+FROM actors
+WHERE nationality <> 'USA'
+INTERSECT -- Select all actors who are not from the USA and who are also born after 1990
+SELECT name, 
+       nationality, 
+       year_of_birth
+FROM actors
+WHERE year_of_birth > 1990;

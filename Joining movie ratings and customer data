@@ -1,0 +1,175 @@
+--LEFT JOIN
+SELECT *
+FROM customers AS c
+WHERE c.customer_id =1;
+--LEFT TABLE: renting_selected RIGHT TABLE: customers_selected
+LEFT JOIN EXAMPLE
+SELECT *
+FROM renting_selected AS r
+LEFT JOIN customers_selected AS c
+ON r.customer_id = c.customer_id;
+--MORE than one JOIN
+SELECT m.title,
+        c.name
+FROM renting AS r
+LEFT JOIN movies AS m
+ON r.movie_id = m.movie_id
+LEFT JOIN customers AS c
+ON r.customer_id = c.customer_id;
+SELECT * -- Join renting with customers
+FROM renting AS r
+LEFT JOIN customers AS c
+ON r.customer_id = c.customer_id;
+SELECT 
+	SUM(m.renting_price), -- Get the revenue from movie rentals
+	COUNT(*), -- Count the number of rentals
+	COUNT(DISTINCT r.customer_id) -- Count the number of customers
+FROM renting AS r
+LEFT JOIN movies AS m
+ON r.movie_id = m.movie_id;
+SELECT a.name, -- Create a list of movie titles and actor names
+       m.title
+FROM actsin AS ai
+LEFT JOIN movies AS m
+ON m.movie_id = ai.movie_id
+LEFT JOIN actors AS a
+ON a.actor_id = ai.actor_id;
+--MONEY SPENT PER CUSTOMER WITH SUB-QUERIES
+SELECT * ---Query 1
+FROM actors
+WHERE gender = 'female';
+SELECT af.nationaility,
+        MIN(af.year_of_birth),
+        MAX(af.year_of_birth)
+FROM
+    (SELECT *
+      FROM actors
+      WHERE gender = 'female') AS af
+GROUP BY af.nationality;
+-How much money did each customer spend?
+-First step: Add renting_price from movies to table renting
+SELECT r.customer_id,
+        m.renting_price
+FROM renting AS r
+LEFT JOIN movies AS m
+ON r.movie_id=m.movie_id;
+SECOND STEP:
+SELECT rm.customer_id,
+        SUM(rm.renting_price)
+FROM
+        (SELECT r.customer_id,
+                m.renting_price
+        FROM renting AS r
+        LEFT JOIN movies AS m
+        ON r.movie_id=m.movie_id) AS rm
+GROUP BY rm.customer_id;
+SELECT m.title, -- Use a join to get the movie title and price for each movie rental
+       m.renting_price
+FROM renting AS r
+LEFT JOIN movies AS m
+ON r.movie_id=m.movie_id;
+SELECT rm.title, -- Report the income from movie rentals for each movie 
+       SUM(rm.renting_price) AS income_movie
+FROM
+       (SELECT m.title, 
+               m.renting_price
+       FROM renting AS r
+       LEFT JOIN movies AS m
+       ON r.movie_id=m.movie_id) AS rm
+GROUP BY rm.title
+ORDER BY income_movie DESC; -- Order the result by decreasing income
+SELECT a.gender, -- Report for male and female actors from the USA 
+       MIN(a.year_of_birth), -- The year of birth of the oldest actor
+       MAX(a.year_of_birth) -- The year of birth of the youngest actor
+FROM
+    (SELECT * -- Use a subsequent SELECT to get all information about actors from the USA
+    FROM actors
+    WHERE nationality = 'USA') AS a -- Give the table the name a
+GROUP BY a.gender;
+--NESTED QUERY
+SELECT DISTINCT customer_id
+FROM renting
+WHERE renting <= 3
+SELECT name
+FROM customers
+WHERE customer_id IN
+      (SELECT DISTINCT customer_id
+        FROM renting
+        WHERE rating <=3);
+SELECT MIN(date_account_start)
+FROM customers
+WHERE country = 'Austria';
+SELECT country, MIN(date_account_start)
+FROM customers
+GROUP BY country
+HAVING MIN(date_account_start) <
+      (SELECT MIN(date_account_start)
+        FROM customers
+        WHERE country = 'Austria');
+SELECT name
+FROM actors
+WHERE actor_id IN
+    (SELECT actor_id
+      FROM actsin
+      WHERE movie_id =
+          (SELECT movie_id
+            FROM movies
+            WHERE title='Ray'));
+SELECT movie_id -- Select movie IDs with more than 5 views
+FROM renting
+GROUP BY movie_id
+HAVING COUNT(*) > 5
+SELECT *
+FROM movies
+WHERE movie_id IN  -- Select movie IDs from the inner query
+	(SELECT movie_id
+	FROM renting
+	GROUP BY movie_id
+	HAVING COUNT(*) > 5)
+SELECT *
+FROM customers
+WHERE customer_id IN -- Select all customers with more than 10 movie rentals
+	(SELECT customer_id
+	FROM renting
+	GROUP BY customer_id
+	HAVING COUNT(*) > 10);
+SELECT movie_id,  -- Select movie IDs and calculate the average rating 
+       AVG(rating)
+FROM renting
+GROUP BY movie_id
+HAVING AVG(rating) >   -- Of movies with rating above average
+	(SELECT AVG(rating)
+	FROM renting);
+SELECT title -- Report the movie titles of all movies with average rating higher than the total average
+FROM movies
+WHERE movie_id IN
+	(SELECT movie_id
+	 FROM renting
+     GROUP BY movie_id
+     HAVING AVG(rating) > 
+		(SELECT AVG(rating)
+		 FROM renting));
+--CORRELATED QUERY
+SELECT *
+FROM movies as m
+WHERE 5 <
+  (SELECT COUNT(*)
+  FROM renting as r
+  WHERE r.movie_id=m.movie_id);
+-- Count movie rentals of customer 45
+SELECT COUNT(*)
+FROM renting as r
+WHERE customer_id=45;
+-- Select customers with less than 5 movie rentals
+SELECT *
+FROM customers as c
+WHERE 5 > 
+	(SELECT count(*)
+	FROM renting as r
+	WHERE r.customer_id = c.customer_id);
+SELECT *
+FROM movies AS m
+WHERE 5 < -- Select all movies with more than 5 ratings
+	(SELECT COUNT(rating)
+	FROM renting AS r
+	WHERE r.movie_id = m.movie_id);

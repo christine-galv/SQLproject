@@ -1,0 +1,107 @@
+--GROUP BY CUBE--
+SELECT country,
+        genre,
+        COUNT(*)
+FROM renting_extended
+GROUP BY CUBE (country,genre);
+--Counting by ratings--
+SELECT country,
+        genre,
+        COUNT(rating)
+FROM renting_extended
+GROUP BY CUBE (country,genre);
+SELECT gender, -- Extract information of a pivot table of gender and country for the number of customers
+	   country,
+	   COUNT(*)
+FROM customers
+GROUP BY CUBE (gender, country)
+ORDER BY country;
+-- Augment the records of movie rentals with information about movies and customers
+SELECT *
+FROM renting AS r
+LEFT JOIN movies AS m
+ON m.movie_id = r.movie_id
+LEFT JOIN customers AS c
+ON r.customer_id = c.customer_id;
+-- Calculate the average rating for each country
+SELECT 
+	c.country, 
+	AVG(r.rating)
+FROM renting AS r
+LEFT JOIN movies AS m
+ON m.movie_id = r.movie_id
+LEFT JOIN customers AS c
+ON r.customer_id = c.customer_id
+GROUP BY c.country;
+--ROLLUP
+SELECT country,
+        genre,
+        COUNT(*)
+FROM renting_extended
+GROUP BY ROLLUP (country, genre);
+--Number of rentals and ratings--
+SELECT country,
+        genre, 
+        COUNT(*) AS n_rentals,
+        COUNT(rating) AS n_ratings
+FROM renting_extended
+GROUP BY ROLLUP (genre, country);
+-
+SELECT 
+	nationality, -- Select nationality of the actors
+    gender, -- Select gender of the actors
+    COUNT(*) -- Count the number of actors
+FROM actors
+GROUP BY GROUPING SETS ((nationality), (gender), ()); -- Use the correct GROUPING SETS operation
+
+SELECT m.genre, -- For each genre, calculate:
+	   AVG(r.rating) AS avg_rating, -- The average rating and use the alias avg_rating
+	   COUNT(r.rating) AS n_rating, -- The number of ratings and use the alias n_rating
+	   COUNT(*) AS n_rentals,     -- The number of movie rentals and use the alias n_rentals
+	   COUNT(DISTINCT m.movie_id) AS n_movies -- The number of distinct movies and use the alias n_movies
+FROM renting AS r
+LEFT JOIN movies AS m
+ON m.movie_id = r.movie_id
+WHERE r.movie_id IN ( 
+	SELECT movie_id
+	FROM renting
+	GROUP BY movie_id
+	HAVING COUNT(rating) >= 3)
+AND r.date_renting >= '2018-01-01'
+GROUP BY m.genre;
+
+SELECT genre,
+	   AVG(rating) AS avg_rating,
+	   COUNT(rating) AS n_rating,
+       COUNT(*) AS n_rentals,     
+	   COUNT(DISTINCT m.movie_id) AS n_movies 
+FROM renting AS r
+LEFT JOIN movies AS m
+ON m.movie_id = r.movie_id
+WHERE r.movie_id IN ( 
+	SELECT movie_id
+	FROM renting
+	GROUP BY movie_id
+	HAVING COUNT(rating) >= 3)
+AND r.date_renting >= '2018-01-01'
+GROUP BY genre
+
+SELECT a.nationality,
+       a.gender,
+	   AVG(r.rating) AS avg_rating,
+	   COUNT(r.rating) AS n_rating,
+	   COUNT(*) AS n_rentals,
+	   COUNT(DISTINCT a.actor_id) AS n_actors
+FROM renting AS r
+LEFT JOIN actsin AS ai
+ON ai.movie_id = r.movie_id
+LEFT JOIN actors AS a
+ON ai.actor_id = a.actor_id
+WHERE r.movie_id IN ( 
+	SELECT movie_id
+	FROM renting
+	GROUP BY movie_id
+	HAVING COUNT(rating) >= 4)
+AND r.date_renting >= '2018-04-01'
+GROUP BY CUBE (a.nationality, a.gender); -- Provide results for all aggregation levels represented in a pivot table
+ORDER BY avg_rating DESC; -- Order the table by decreasing average rating
